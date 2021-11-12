@@ -2,10 +2,31 @@
 
 namespace App\Entity;
 
-use App\Repository\InvoiceRepository;
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\InvoiceRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
+ * @ApiResource(
+ *  subresourceOperations={
+ *      "api_customers_invoices_get_subresource"={
+ *          "method"="GET",
+ *          "normalization_context"={"groups"={"invoices_subresource"}}
+ *      }
+ *  },
+ *  attributes={
+ *      "pagination_enabled"=true, 
+ *      "order"={"amount"="desc"}
+ *  },
+ *  normalizationContext={"groups"={"invoices_read"}}
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"status"})
+ * @ApiFilter(OrderFilter::class, properties={"amount"})
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
  */
 class Invoice
@@ -14,34 +35,49 @@ class Invoice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"invoices_read","customers_read","invoices_subresource"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoices_read","customers_read","invoices_subresource"})
      */
     private $amount;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"invoices_read","customers_read","invoices_subresource"})
      */
     private $sentAt;
 
     /**
      * @ORM\Column(type="string", length=300)
+     * @Groups({"invoices_read","customers_read","invoices_subresource"})
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="invoices")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoices_read"})
      */
     private $customer;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"invoices_read","customers_read","invoices_subresource"})
      */
     private $chrono;
+
+    /**
+     * Get User concerned by invoice 
+     * @Groups({"invoices_read", "invoices_subresource"})
+     */
+    public function getUser(): User
+    {
+        return $this->getCustomer()->getCurrentUser(); 
+    }
 
     public function getId(): ?int
     {
