@@ -61,8 +61,8 @@ class Invoice
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"invoices_read","customers_read","invoices_subresource"})
-     * @Assert\DateTime(message="La date doit être au format YYYY-MM-DD")
-     * @Assert\NotBlank(message="La date d'envoi doit être renseignée")
+     * @Assert\NotNull(message="La date d'envoi doit être renseignée")
+     * @Assert\Type("DateTime")(message="La date doit être au format YYYY-MM-DD")
      */
     private $sentAt;
 
@@ -96,7 +96,7 @@ class Invoice
      */
     public function getUser(): User
     {
-        return $this->getCustomer()->getCurrentUser(); 
+        return $this->getCustomer()->getCurrentUser();
     }
 
     public function getId(): ?int

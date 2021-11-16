@@ -101,14 +101,14 @@ class PatchedDateTimeNormalizer implements NormalizerInterface, DenormalizerInte
 
             $dateTimeErrors = \DateTime::class === $type ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
 
-            throw new NotNormalizableValueException(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count'])."\n".implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])));
+            throw new NotNormalizableValueException(sprintf('Parsing datetime string "%s" using format "%s" resulted in %d errors: ', $data, $dateTimeFormat, $dateTimeErrors['error_count']) . "\n" . implode("\n", $this->formatDateTimeErrors($dateTimeErrors['errors'])));
         }
 
         try {
             return \DateTime::class === $type ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
 
-            if($context['disable_type_enforcement'] ?? false){
+            if ($context['disable_type_enforcement'] ?? false) {
                 return $data;
             }
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
