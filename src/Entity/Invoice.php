@@ -3,14 +3,15 @@
 namespace App\Entity;
 
 use App\Entity\User;
+use App\Filter\OrSearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\InvoiceRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -30,12 +31,21 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     }
  *  },
  *  attributes={
- *      "pagination_enabled"=false,
- *      "pagination_items_per_page"=20,
+ *      "pagination_enabled"=true,
+ *      "pagination_items_per_page"=10,
  *      "order": {"sentAt":"desc"}
  *  },
  *  normalizationContext={"groups"={"invoices_read"}},
  *  denormalizationContext={"disable_type_enforcement"=true}
+ * )
+ * @ApiFilter(
+ *     OrSearchFilter::class, properties={
+ *         "or_allField"={
+ *                 "status":"ipartial",
+ *                 "customer.firstName":"ipartial",
+ *                 "customer.lastName":"ipartial",
+ *              }
+ *     }
  * )
  * @ApiFilter(OrderFilter::class, properties={"amount"})
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)

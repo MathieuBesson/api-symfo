@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Filter\OrSearchFilter;
 
 /**
  * @ApiResource(
@@ -24,7 +25,27 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      "groups"={"customers_read"}
  *  }
  * )
- * @ApiFilter(SearchFilter::class, properties={"firstName":"partial","lastName","company"})
+ * @ApiFilter(SearchFilter::class, properties={
+ *      "firstName":"partial",
+ *      "lastName":"partial",
+ *      "company":"partial",
+ *      "email":"partial"
+ * })
+ *  attributes={
+ *      "pagination_enabled"=true,
+ *      "pagination_items_per_page"=10,
+ *      "order": {"sentAt":"desc"}
+ *  },
+ * @ApiFilter(
+ *     OrSearchFilter::class, properties={
+ *         "or_firstName_lastName_company_email"={
+ *                 "firstName":"ipartial",
+ *                 "lastName":"ipartial",
+ *                 "company":"ipartial",
+ *                 "email":"ipartial"
+ *              }
+ *     }
+ * )
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  */
 class Customer
@@ -91,12 +112,13 @@ class Customer
      * @Groups({"customers_read"})
      * @return void
      */
-    public function getTotalAmount(){
-        $totalAmount = 0; 
-        foreach($this->getInvoices() as $invoice){
-            $totalAmount += $invoice->getAmount(); 
+    public function getTotalAmount()
+    {
+        $totalAmount = 0;
+        foreach ($this->getInvoices() as $invoice) {
+            $totalAmount += $invoice->getAmount();
         }
-        return $totalAmount; 
+        return $totalAmount;
     }
 
 
@@ -105,12 +127,13 @@ class Customer
      * @Groups({"customers_read"})
      * @return void
      */
-    public function getTotalUnpaidAmount(){
-        $totalUnpaidAmount = 0; 
-        foreach($this->getInvoices() as $invoice){
-            $totalUnpaidAmount += ($invoice->getStatus() === 'PAID' || $invoice->getStatus() === 'CANCELLED') ? 0 : $invoice->getAmount(); 
+    public function getTotalUnpaidAmount()
+    {
+        $totalUnpaidAmount = 0;
+        foreach ($this->getInvoices() as $invoice) {
+            $totalUnpaidAmount += ($invoice->getStatus() === 'PAID' || $invoice->getStatus() === 'CANCELLED') ? 0 : $invoice->getAmount();
         }
-        return $totalUnpaidAmount; 
+        return $totalUnpaidAmount;
     }
 
     public function getId(): ?int

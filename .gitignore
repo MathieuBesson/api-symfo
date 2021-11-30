@@ -23,9 +23,10 @@
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-###> symfony/webpack-encore-bundle ###
-/node_modules/
-/public/build/
-npm-debug.log
-yarn-error.log
-###< symfony/webpack-encore-bundle ###
+###> react app ###
+
+*/node_modules/*
+# **/node_modules
+# **/public/build/
+# **npm-debug.log
+# **yarn-error.log
